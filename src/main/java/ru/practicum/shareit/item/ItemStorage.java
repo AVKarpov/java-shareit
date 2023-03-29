@@ -6,9 +6,14 @@ import java.util.List;
 
 public interface ItemStorage {
     List<Item> getAllItems();
+
     Item getItemById(Long id);
+
     Item addItem(Item item);
+
     Item updateItem(Item item);
+
     void removeItem(Long id);
+
     List<Item> searchItems(String text);
 }
