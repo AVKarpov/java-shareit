@@ -6,7 +6,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserStorage;
+import ru.practicum.shareit.user.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,11 +19,11 @@ import static ru.practicum.shareit.item.dto.ItemMapper.*;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
     public List<ItemDto> getAllItems(Long userId) {
-        return itemStorage.getAllItems()
+        return itemRepository.getAllItems()
                 .stream()
                 .filter(u -> u.getOwner() != null && u.getOwner().getId().equals(userId))
                 .map(ItemMapper::toItemDto)
@@ -31,20 +31,20 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public ItemDto getItemById(Long itemId) {
-        return toItemDto(itemStorage.getItemById(itemId));
+        return toItemDto(itemRepository.getItemById(itemId));
     }
 
     @Override
     public ItemDto addNewItem(Long userId, ItemDto itemDto) {
-        User user = userStorage.getUserById(userId);
+        User user = userRepository.getUserById(userId);
         Item item = toItem(itemDto);
         item.setOwner(user);
-        return toItemDto(itemStorage.addItem(item));
+        return toItemDto(itemRepository.addItem(item));
     }
 
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
-        Item existItem = itemStorage.getItemById(itemId);
+        Item existItem = itemRepository.getItemById(itemId);
         if (existItem.getOwner() != null && !userId.equals(existItem.getOwner().getId()))
             throw new NoSuchElementException("Ошибка обновления информации о вещи с id = " + itemId);
 
@@ -60,21 +60,21 @@ public class ItemServiceImpl implements ItemService {
         if (updatedItem.getOwner() == null)
             updatedItem.setOwner(existItem.getOwner());
 
-        return toItemDto(itemStorage.updateItem(updatedItem));
+        return toItemDto(itemRepository.updateItem(updatedItem));
     }
 
     @Override
     public void deleteItem(Long userId, Long itemId) {
-        Item existItem = itemStorage.getItemById(itemId);
+        Item existItem = itemRepository.getItemById(itemId);
         if (existItem.getOwner() != null && !userId.equals(existItem.getOwner().getId()))
             throw new NoSuchElementException("Ошибка удаления вещи с id = " + itemId + " пользователем с id = " + userId);
-        itemStorage.removeItem(itemId);
+        itemRepository.removeItem(itemId);
     }
 
     public List<ItemDto> searchItems(String text) {
         if (text.isEmpty())
             return Collections.emptyList();
-        return itemStorage.searchItems((text.toLowerCase())).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return itemRepository.searchItems((text.toLowerCase())).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
 }

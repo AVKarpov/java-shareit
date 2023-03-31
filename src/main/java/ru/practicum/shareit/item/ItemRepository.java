@@ -4,7 +4,7 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
-public interface ItemStorage {
+public interface ItemRepository {
     List<Item> getAllItems();
 
     Item getItemById(Long id);

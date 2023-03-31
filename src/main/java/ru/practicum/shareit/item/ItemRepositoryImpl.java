@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class InMemoryItemStorage implements ItemStorage {
+public class ItemRepositoryImpl implements ItemRepository {
     private final Map<Long, Item> items = new HashMap<>();
     private long generatorId = 0;
 
