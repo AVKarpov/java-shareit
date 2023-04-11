@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import ru.practicum.shareit.booking.BookingShortForItem;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+
 
 @Data
 @Builder
@@ -14,10 +17,13 @@ import javax.validation.constraints.NotNull;
 @RequiredArgsConstructor
 public class ItemDto {
     private Long id;
-    @NotBlank
+    @NotNull @NotBlank
     private String name;
-    @NotBlank
+    @NotNull @NotBlank
     private String description;
     @NotNull
     private Boolean available;
+    private BookingShortForItem lastBooking;
+    private BookingShortForItem nextBooking;
+    private List<CommentResponseDto> comments;
 }
