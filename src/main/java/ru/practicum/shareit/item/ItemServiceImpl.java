@@ -36,7 +36,7 @@ public class ItemServiceImpl implements ItemService {
 
     public List<ItemDto> getAllItems(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format(USER_NOT_FOUND_MSG, userId)));
         List<Item> items = itemRepository.findByOwnerOrderByIdAsc(user);
         List<ItemDto> itemDtos = new ArrayList<>();
@@ -54,10 +54,10 @@ public class ItemServiceImpl implements ItemService {
 
     public ItemDto getItemById(Long userId, Long itemId) {
         userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format(USER_NOT_FOUND_MSG, userId)));
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(()-> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
 
         ItemDto itemDto = toItemDto(item);
         if (userId.equals(item.getOwner().getId())) {
@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addNewItem(Long userId, ItemDto itemDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_MSG, userId)));
         Item item = toItem(itemDto);
         item.setOwner(user);
         return toItemDto(itemRepository.save(item));
@@ -82,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(Long id, Long itemId, ItemDto itemDto) {
         Item existItem = itemRepository.findById(itemId)
-                .orElseThrow(()-> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
         if (existItem.getOwner() != null && !id.equals(existItem.getOwner().getId()))
             throw new EntityNotFoundException("Ошибка обновления информации о вещи с id = " + existItem.getId());
         Item updatedItem = toItem(itemDto);
@@ -102,7 +102,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void deleteItem(Long userId, Long itemId) {
         Item existItem = itemRepository.findById(itemId)
-                .orElseThrow(()-> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
         if (existItem.getOwner() != null && !userId.equals(existItem.getOwner().getId()))
             throw new EntityNotFoundException("Ошибка удаления вещи с id = " + existItem.getId()
                     + " пользователем с id = " + userId);
@@ -117,10 +117,10 @@ public class ItemServiceImpl implements ItemService {
 
     public CommentResponseDto addComment(Long userId, Long itemId, CommentRequestDto text) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format(USER_NOT_FOUND_MSG, userId)));
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(()-> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
         BookingShortForItem booking = bookingRepository.findFirstByItemAndBookerAndStatus(item, user, BookingStatus.APPROVED);
         if (booking == null)
             throw new ValidationException("Нельзя оставить комментарий у вещи, которую не бронировал!");

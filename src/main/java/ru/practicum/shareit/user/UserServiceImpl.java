@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto getUserById(Long id) {
         return toUserDto(userRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException(String.format("Пользователь с id [%d] не найден!", id))));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с id [%d] не найден!", id))));
     }
 
     public UserDto addUser(UserDto userDto) {
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto updateUser(Long id, UserDto userDto) {
         User existUser = userRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException(String.format("Пользователь с id [%d] не найден!", id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с id [%d] не найден!", id)));
         User updatedUser = toUser(userDto);
         if (updatedUser.getName() == null)
             updatedUser.setName(existUser.getName());

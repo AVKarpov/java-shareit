@@ -5,7 +5,9 @@ import ru.practicum.shareit.item.model.Comment;
 
 public class CommentMapper {
 
-    private CommentMapper() {}
+    private CommentMapper() {
+
+    }
 
     public static CommentResponseDto toCommentDto(Comment comment) {
         return CommentResponseDto.builder()

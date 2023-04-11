@@ -34,10 +34,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto addNewBooking(Long userId, BookingRequestDto bookingRequestDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format(USER_NOT_FOUND_MSG, userId)));
         Item item = itemRepository.findById(bookingRequestDto.getItemId())
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Вещь с id [%d] не найдена!", bookingRequestDto.getItemId())));
         if (item.getOwner() != null && userId.equals(item.getOwner().getId()))
             throw new EntityNotFoundException("Нельзя забронировать свою вешь!");
@@ -61,10 +61,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto approveBooking(Long userId, Long bookingId, Boolean isApproved) {
         userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format(USER_NOT_FOUND_MSG, userId)));
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Бронирование с id [%d] не найдено!", bookingId)));
         if (!Objects.equals(booking.getItem().getOwner().getId(), userId))
              throw new EntityNotFoundException(
@@ -81,10 +81,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto getBookingById(Long userId, Long bookingId) {
         userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format(USER_NOT_FOUND_MSG, userId)));
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Бронирование с id [%d] не найдено!", bookingId)));
         if (!Objects.equals(booking.getBooker().getId(), userId) &&
                 !Objects.equals(booking.getItem().getOwner().getId(), userId))
@@ -95,7 +95,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingResponseDto> getAllBookings(Long userId, String state) {
         userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format(USER_NOT_FOUND_MSG, userId)));
         List<Booking> bookings;
         switch (parseStatus(state)) {
@@ -139,7 +139,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingResponseDto> getAllBookingsForOwner(Long userId, String state) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         String.format(USER_NOT_FOUND_MSG, userId)));
         List<Item> items = itemRepository.findByOwnerOrderByIdAsc(user);
         List<Booking> bookings = new ArrayList<>();
