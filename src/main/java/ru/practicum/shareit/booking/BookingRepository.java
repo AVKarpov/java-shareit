@@ -19,22 +19,20 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartAsc(Long bookerId, LocalDateTime start,
                                                                               LocalDateTime end);
 
-    List<Booking> findByItemOrderByStartDesc(Item item);
+    List<Booking> findByItemInOrderByStartDesc(List<Item> items);
 
-    List<Booking> findByItemAndEndIsBeforeOrderByStartDesc(Item item, LocalDateTime end);
+    List<Booking> findByItemInAndEndIsBeforeOrderByStartDesc(List<Item> items, LocalDateTime end);
 
-    List<Booking> findByItemAndStartIsAfterOrderByStartDesc(Item item, LocalDateTime start);
+    List<Booking> findByItemInAndStartIsAfterOrderByStartDesc(List<Item> items, LocalDateTime start);
 
-    List<Booking> findByItemAndStatusOrderByStartDesc(Item item, BookingStatus status);
+    List<Booking> findByItemInAndStatusOrderByStartDesc(List<Item> items, BookingStatus status);
 
-    List<Booking> findByItemAndStartIsBeforeAndEndIsAfterOrderByStartDesc(Item item, LocalDateTime start,
+    List<Booking> findByItemInAndStartIsBeforeAndEndIsAfterOrderByStartDesc(List<Item> items, LocalDateTime start,
                                                                           LocalDateTime end);
 
-    BookingShortForItem findFirstByItemAndStartIsBeforeAndStatusOrderByStartDesc(Item item, LocalDateTime end,
-                                                                                 BookingStatus status);
+    List<BookingShortForItem> findByItemInAndStatus(List<Item> items, BookingStatus status);
 
-    BookingShortForItem findFirstByItemAndStartIsAfterAndStatusOrderByStartAsc(Item item, LocalDateTime start,
-                                                                               BookingStatus status);
+    List<BookingShortForItem> findByItemAndStatus(Item item, BookingStatus status);
 
     BookingShortForItem findFirstByItemAndBookerAndStatus(Item item, User booker, BookingStatus status);
 }

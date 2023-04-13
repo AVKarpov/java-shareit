@@ -30,11 +30,11 @@ public class Item {
     @Column(name = "is_available", nullable = false)
     private Boolean isAvailable; //статус о том, доступна или нет вещь для аренды
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner; //владелец вещи
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "request_id")
     private ItemRequest request; //если вещь была создана по запросу другого пользователя, то в этом
                                  //поле будет храниться ссылка на соответствующий запрос

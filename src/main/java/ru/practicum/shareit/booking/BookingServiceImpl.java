@@ -6,6 +6,8 @@ import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingStatusDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
@@ -29,16 +31,13 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
-    private static final String USER_NOT_FOUND_MSG = "Пользователь с id [%d] не найден!";
 
     @Override
     public BookingResponseDto addNewBooking(Long userId, BookingRequestDto bookingRequestDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         Item item = itemRepository.findById(bookingRequestDto.getItemId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Вещь с id [%d] не найдена!", bookingRequestDto.getItemId())));
+                .orElseThrow(() -> new ItemNotFoundException(bookingRequestDto.getItemId()));
         if (item.getOwner() != null && userId.equals(item.getOwner().getId()))
             throw new EntityNotFoundException("Нельзя забронировать свою вешь!");
         if (Boolean.FALSE.equals(item.getIsAvailable()))
@@ -61,8 +60,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto approveBooking(Long userId, Long bookingId, Boolean isApproved) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Бронирование с id [%d] не найдено!", bookingId)));
@@ -81,8 +79,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto getBookingById(Long userId, Long bookingId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Бронирование с id [%d] не найдено!", bookingId)));
@@ -95,8 +92,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingResponseDto> getAllBookings(Long userId, String state) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         List<Booking> bookings;
         switch (parseStatus(state)) {
             case PAST:
@@ -139,36 +135,29 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingResponseDto> getAllBookingsForOwner(Long userId, String state) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         List<Item> items = itemRepository.findByOwnerOrderByIdAsc(user);
         List<Booking> bookings = new ArrayList<>();
-
         switch (parseStatus(state)) {
             case PAST:
-                for (Item item : items)
-                    bookings.addAll(bookingRepository.findByItemAndEndIsBeforeOrderByStartDesc(item, LocalDateTime.now()));
+                    bookings.addAll(bookingRepository.findByItemInAndEndIsBeforeOrderByStartDesc(items, LocalDateTime.now()));
                 break;
             case FUTURE:
-                for (Item item : items)
-                    bookings.addAll(bookingRepository.findByItemAndStartIsAfterOrderByStartDesc(item, LocalDateTime.now()));
+                    bookings.addAll(bookingRepository.findByItemInAndStartIsAfterOrderByStartDesc(items, LocalDateTime.now()));
                 break;
 
             case CURRENT:
-                for (Item item : items)
-                    bookings.addAll(bookingRepository.findByItemAndStartIsBeforeAndEndIsAfterOrderByStartDesc(item,
+                    bookings.addAll(bookingRepository.findByItemInAndStartIsBeforeAndEndIsAfterOrderByStartDesc(items,
                             LocalDateTime.now(), LocalDateTime.now()));
                 break;
 
             case WAITING:
             case REJECTED:
-                for (Item item : items)
-                    bookings.addAll(bookingRepository.findByItemAndStatusOrderByStartDesc(item,
+                    bookings.addAll(bookingRepository.findByItemInAndStatusOrderByStartDesc(items,
                                 BookingStatus.valueOf(state)));
                 break;
             default: //ALL
-                for (Item item : items)
-                    bookings.addAll(bookingRepository.findByItemOrderByStartDesc(item));
+                    bookings.addAll(bookingRepository.findByItemInOrderByStartDesc(items));
         }
 
         return bookings

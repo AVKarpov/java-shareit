@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class BookingShortForItem {
     Long id;
     Long bookerId;
+    Long itemId;
     LocalDateTime start;
     LocalDateTime end;
 }

@@ -24,11 +24,11 @@ public class Comment {
     @Column(nullable = false, length = 512)
     private String text;    //содержимое комментария
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "item_id")
     Item item;              //вещь, к которой относится комментарий
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "author_id")
     User author;            //автор комментария
 

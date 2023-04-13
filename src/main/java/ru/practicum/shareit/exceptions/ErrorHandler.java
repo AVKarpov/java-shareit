@@ -18,27 +18,25 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(ValidationException e) {
-        return new ErrorResponse(
-                String.format(e.getMessage())
-        );
+        return new ErrorResponse(e.getMessage());
     }
 
     //400 - ошибка валидации полей
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return new ErrorResponse(
-                String.format(e.getMessage())
-        );
+        return new ErrorResponse(e.getMessage());
     }
 
     //404 — для всех ситуаций, если искомый объект не найден
-    @ExceptionHandler
+    @ExceptionHandler({
+            UserNotFoundException.class,
+            ItemNotFoundException.class,
+            EntityNotFoundException.class
+    })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleObjectNotFoundException(EntityNotFoundException e) {
-        return new ErrorResponse(
-                String.format(e.getMessage())
-        );
+        return new ErrorResponse(e.getMessage());
     }
 
     //500 — если возникло исключение

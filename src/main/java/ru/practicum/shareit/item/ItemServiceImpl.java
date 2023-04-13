@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingShortForItem;
 import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
@@ -16,6 +18,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,21 +34,17 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
-    private static final String USER_NOT_FOUND_MSG = "Пользователь с id [%d] не найден!";
-    private static final String ITEM_NOT_FOUND_MSG = "Вещь с id [%d] не найдена!";
 
     public List<ItemDto> getAllItems(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         List<Item> items = itemRepository.findByOwnerOrderByIdAsc(user);
+        List<BookingShortForItem> bookings = bookingRepository.findByItemInAndStatus(items, BookingStatus.APPROVED);
         List<ItemDto> itemDtos = new ArrayList<>();
         for (Item item : items) {
             ItemDto itemDto = toItemDto(item);
-            itemDto.setLastBooking(bookingRepository.findFirstByItemAndStartIsBeforeAndStatusOrderByStartDesc(item,
-                    LocalDateTime.now(), BookingStatus.APPROVED));
-            itemDto.setNextBooking(bookingRepository.findFirstByItemAndStartIsAfterAndStatusOrderByStartAsc(item,
-                    LocalDateTime.now(), BookingStatus.APPROVED));
+            itemDto.setLastBooking(findLastBookingForItem(item, bookings));
+            itemDto.setNextBooking(findNextBookingForItem(item, bookings));
             itemDto.setComments(getCommentsByItem(item));
             itemDtos.add(itemDto);
         }
@@ -54,26 +53,41 @@ public class ItemServiceImpl implements ItemService {
 
     public ItemDto getItemById(Long userId, Long itemId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
-
+                .orElseThrow(() -> new ItemNotFoundException(itemId));
         ItemDto itemDto = toItemDto(item);
         if (userId.equals(item.getOwner().getId())) {
-            itemDto.setLastBooking(bookingRepository.findFirstByItemAndStartIsBeforeAndStatusOrderByStartDesc(item,
-                    LocalDateTime.now(), BookingStatus.APPROVED));
-            itemDto.setNextBooking(bookingRepository.findFirstByItemAndStartIsAfterAndStatusOrderByStartAsc(item,
-                    LocalDateTime.now(), BookingStatus.APPROVED));
+            List<BookingShortForItem> bookings = bookingRepository.findByItemAndStatus(item, BookingStatus.APPROVED);
+            itemDto.setLastBooking(findLastBookingForItem(item, bookings));
+            itemDto.setNextBooking(findNextBookingForItem(item, bookings));
         }
         itemDto.setComments(getCommentsByItem(item));
         return itemDto;
     }
 
+    private BookingShortForItem findLastBookingForItem(Item item, List<BookingShortForItem> bookings) {
+        return bookings
+                .stream()
+                .filter(b -> b.getItemId().equals(item.getId()))
+                .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
+                .max(Comparator.comparing(BookingShortForItem::getStart))
+                .orElse(null);
+    }
+
+    private BookingShortForItem findNextBookingForItem(Item item, List<BookingShortForItem> bookings) {
+        return bookings
+                .stream()
+                .filter(b -> b.getItemId().equals(item.getId()))
+                .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
+                .min(Comparator.comparing(BookingShortForItem::getStart))
+                .orElse(null);
+    }
+
     @Override
     public ItemDto addNewItem(Long userId, ItemDto itemDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         Item item = toItem(itemDto);
         item.setOwner(user);
         return toItemDto(itemRepository.save(item));
@@ -82,7 +96,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(Long id, Long itemId, ItemDto itemDto) {
         Item existItem = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
+                .orElseThrow(() -> new ItemNotFoundException(itemId));
         if (existItem.getOwner() != null && !id.equals(existItem.getOwner().getId()))
             throw new EntityNotFoundException("Ошибка обновления информации о вещи с id = " + existItem.getId());
         Item updatedItem = toItem(itemDto);
@@ -102,7 +116,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void deleteItem(Long userId, Long itemId) {
         Item existItem = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
+                .orElseThrow(() -> new ItemNotFoundException(itemId));
         if (existItem.getOwner() != null && !userId.equals(existItem.getOwner().getId()))
             throw new EntityNotFoundException("Ошибка удаления вещи с id = " + existItem.getId()
                     + " пользователем с id = " + userId);
@@ -117,10 +131,9 @@ public class ItemServiceImpl implements ItemService {
 
     public CommentResponseDto addComment(Long userId, Long itemId, CommentRequestDto text) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(USER_NOT_FOUND_MSG, userId)));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(ITEM_NOT_FOUND_MSG, itemId)));
+                .orElseThrow(() -> new ItemNotFoundException(itemId));
         BookingShortForItem booking = bookingRepository.findFirstByItemAndBookerAndStatus(item, user, BookingStatus.APPROVED);
         if (booking == null)
             throw new ValidationException("Нельзя оставить комментарий у вещи, которую не бронировал!");

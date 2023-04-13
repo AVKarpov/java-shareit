@@ -3,10 +3,10 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto getUserById(Long id) {
         return toUserDto(userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с id [%d] не найден!", id))));
+                .orElseThrow(() -> new UserNotFoundException(id)));
     }
 
     public UserDto addUser(UserDto userDto) {
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto updateUser(Long id, UserDto userDto) {
         User existUser = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с id [%d] не найден!", id)));
+                .orElseThrow(() -> new UserNotFoundException(id));
         User updatedUser = toUser(userDto);
         if (updatedUser.getName() == null)
             updatedUser.setName(existUser.getName());
