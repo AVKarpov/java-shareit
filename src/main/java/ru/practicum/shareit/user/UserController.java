@@ -1,10 +1,10 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -25,13 +25,13 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody UserDto userDto) {
+    public UserDto create(@RequestBody @Validated UserDto userDto) {
         return userService.addUser(userDto);
     }
 
     @PatchMapping(value = "/{id}")
-    public UserDto update(@RequestBody UserDto userDto,
-                          @PathVariable Long id) {
+    public UserDto update(@PathVariable Long id,
+                          @RequestBody UserDto userDto) {
         return userService.updateUser(id, userDto);
     }
 
