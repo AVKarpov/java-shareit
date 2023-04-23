@@ -57,7 +57,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         User requestor = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequestorNot(requestor,
-                PageRequest.of(from/size, size, Sort.by(Sort.Direction.DESC, "created")));
+                PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "created")));
         if (!itemRequests.isEmpty()) {
             List<Item> items = itemRepository.findByRequestIdIn(
                     itemRequests

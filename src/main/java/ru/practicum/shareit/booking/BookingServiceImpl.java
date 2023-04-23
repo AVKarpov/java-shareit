@@ -99,14 +99,14 @@ public class BookingServiceImpl implements BookingService {
             case PAST:
                 bookings = new ArrayList<>(
                         bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now(),
-                                PageRequest.of(from/size, size))
+                                PageRequest.of(from / size, size))
                 );
                 break;
 
             case FUTURE:
                 bookings = new ArrayList<>(
                         bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now(),
-                                PageRequest.of(from/size, size))
+                                PageRequest.of(from / size, size))
                 );
                 break;
 
@@ -114,7 +114,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = new ArrayList<>(
                         bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartAsc(userId,
                                 LocalDateTime.now(), LocalDateTime.now(),
-                                PageRequest.of(from/size, size))
+                                PageRequest.of(from / size, size))
                 );
                 break;
 
@@ -123,13 +123,13 @@ public class BookingServiceImpl implements BookingService {
                 bookings = new ArrayList<>(
                         bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId,
                                 BookingStatus.valueOf(state),
-                                PageRequest.of(from/size, size))
+                                PageRequest.of(from / size, size))
                 );
                 break;
 
             default: //ALL
                 bookings = new ArrayList<>(bookingRepository.findByBookerIdOrderByStartDesc(userId,
-                        PageRequest.of(from/size, size)));
+                        PageRequest.of(from / size, size)));
         }
 
         return bookings
@@ -147,25 +147,25 @@ public class BookingServiceImpl implements BookingService {
         switch (parseStatus(state)) {
             case PAST:
                     bookings.addAll(bookingRepository.findByItemInAndEndIsBeforeOrderByStartDesc(items, LocalDateTime.now(),
-                                    PageRequest.of(from/size, size)));
+                                    PageRequest.of(from / size, size)));
                 break;
             case FUTURE:
                     bookings.addAll(bookingRepository.findByItemInAndStartIsAfterOrderByStartDesc(items, LocalDateTime.now(),
-                            PageRequest.of(from/size, size)));
+                            PageRequest.of(from / size, size)));
                 break;
 
             case CURRENT:
                     bookings.addAll(bookingRepository.findByItemInAndStartIsBeforeAndEndIsAfterOrderByStartDesc(items,
-                            LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(from/size, size)));
+                            LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(from / size, size)));
                 break;
 
             case WAITING:
             case REJECTED:
                     bookings.addAll(bookingRepository.findByItemInAndStatusOrderByStartDesc(items,
-                                BookingStatus.valueOf(state), PageRequest.of(from/size, size)));
+                                BookingStatus.valueOf(state), PageRequest.of(from / size, size)));
                 break;
             default: //ALL
-                    bookings.addAll(bookingRepository.findByItemInOrderByStartDesc(items, PageRequest.of(from/size, size)));
+                    bookings.addAll(bookingRepository.findByItemInOrderByStartDesc(items, PageRequest.of(from / size, size)));
         }
 
         return bookings

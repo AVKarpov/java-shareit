@@ -43,7 +43,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getAllItems(Long userId, int from, int size) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
-        List<Item> items = itemRepository.findByOwnerOrderByIdAsc(user, PageRequest.of(from/size, size));
+        List<Item> items = itemRepository.findByOwnerOrderByIdAsc(user, PageRequest.of(from / size, size));
         List<BookingShortForItem> bookings = bookingRepository.findByItemInAndStatus(items, BookingStatus.APPROVED);
         List<ItemDto> itemDtos = new ArrayList<>();
         for (Item item : items) {
@@ -136,7 +136,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> searchItems(String text, int from, int size) {
         if (text.isBlank())
             return Collections.emptyList();
-        return itemRepository.search(text, PageRequest.of(from/size, size))
+        return itemRepository.search(text, PageRequest.of(from / size, size))
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
