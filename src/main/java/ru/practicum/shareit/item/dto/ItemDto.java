@@ -10,7 +10,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -23,6 +22,7 @@ public class ItemDto {
     private String description;
     @NotNull
     private Boolean available;
+    private Long requestId;
     private BookingShortForItem lastBooking;
     private BookingShortForItem nextBooking;
     private List<CommentResponseDto> comments;

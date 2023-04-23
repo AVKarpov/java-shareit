@@ -1,16 +1,16 @@
 package ru.practicum.shareit.request;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -28,6 +28,18 @@ public class ItemRequest {
     @JoinColumn(name = "requestor_id")
     private User requestor;         //пользователь, создавший запрос
 
-    @Transient
     private LocalDateTime created;  //дата и время создания запроса
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        ItemRequest that = (ItemRequest) o;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
