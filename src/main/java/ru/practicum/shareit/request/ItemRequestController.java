@@ -42,7 +42,7 @@ public class ItemRequestController {
 
     //GET /requests/{requestId} - получить данные об одном конкретном запросе вместе с данными об ответах на него
     @GetMapping(value = "/{requestId}")
-    public ItemRequestResponseDto getItemById(@RequestHeader(HEADER_USER_ID) Long userId,
+    public ItemRequestResponseDto getItemRequestById(@RequestHeader(HEADER_USER_ID) Long userId,
                                               @PathVariable Long requestId) {
         return requestService.getRequestById(userId, requestId);
     }
