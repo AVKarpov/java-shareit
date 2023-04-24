@@ -71,7 +71,7 @@ class ItemRequestServiceImplTest {
     void getAllOthersItemRequestsReturnItemRequestsTest() {
         Long otherUserId = userService.addUser(UserDto.builder().name("otherUser").email("otheruser@user.com").build()).getId();
         itemRequestService.addItemRequest(otherUserId, itemRequestDto);
-        Assertions.assertEquals(1, itemRequestService.getAllOthersItemRequests(userId, 0 , 5).size(), "Количество запросов не совпадает");
+        Assertions.assertEquals(1, itemRequestService.getAllOthersItemRequests(userId, 0, 5).size(), "Количество запросов не совпадает");
     }
 
     @Test
