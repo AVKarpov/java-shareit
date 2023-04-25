@@ -236,11 +236,20 @@ class ItemServiceImplTest {
     void addCommentReturnValidationExceptionTest() {
         Long userId = userService.addUser(userDto).getId();
         Long itemId = itemService.addNewItem(userId, itemDto).getId();
-        itemService.addNewItem(userId, itemDto);
         CommentRequestDto comment = CommentRequestDto.builder()
                 .text("Test comment")
                 .build();
         assertThrows(ValidationException.class, () -> itemService.addComment(userId, itemId, comment));
+    }
+
+    @Test
+    void addCommentWithWrongUserReturnUserNotFoundExceptionTest() {
+        Long userId = userService.addUser(userDto).getId();
+        Long itemId = itemService.addNewItem(userId, itemDto).getId();
+        CommentRequestDto comment = CommentRequestDto.builder()
+                .text("Test comment")
+                .build();
+        assertThrows(UserNotFoundException.class, () -> itemService.addComment(999L, itemId, comment));
     }
 
     @Test

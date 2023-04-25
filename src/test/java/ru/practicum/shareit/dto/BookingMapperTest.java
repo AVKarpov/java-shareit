@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.practicum.shareit.booking.dto.BookingMapper.*;
 
 class BookingMapperTest {
@@ -55,6 +56,23 @@ class BookingMapperTest {
         Booking booking = toBooking(bookingRequestDto);
         assertEquals(bookingRequestDto.getStart(), booking.getStart());
         assertEquals(bookingRequestDto.getEnd(), booking.getEnd());
+    }
+
+    @Test
+    void bookingEqualsTest() {
+        Booking booking1 = Booking.builder()
+                .id(1L)
+                .start(LocalDateTime.of(2022, 10, 22, 10,0, 5))
+                .end(LocalDateTime.of(2022, 10, 25, 11,30, 5))
+                .status(BookingStatus.APPROVED)
+                .build();
+        Booking booking2 = Booking.builder()
+                .id(1L)
+                .start(LocalDateTime.of(2022, 10, 22, 10,0, 5))
+                .end(LocalDateTime.of(2022, 10, 25, 11,30, 5))
+                .status(BookingStatus.APPROVED)
+                .build();
+        assertTrue(booking1.equals(booking2));
     }
 
 }

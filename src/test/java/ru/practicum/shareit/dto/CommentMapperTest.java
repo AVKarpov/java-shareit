@@ -8,6 +8,7 @@ import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.practicum.shareit.item.dto.CommentMapper.toCommentDto;
 
 class CommentMapperTest {
@@ -28,6 +29,21 @@ class CommentMapperTest {
         assertEquals(comment.getText(), commentResponseDto.getText());
         assertEquals(comment.getAuthor().getName(), commentResponseDto.getAuthorName());
         assertEquals(comment.getCreated(), commentResponseDto.getCreated());
+    }
+
+    @Test
+    void commentEqualsTest() {
+        Comment comment1 = Comment.builder()
+                .id(1L)
+                .text("Test comment")
+                .created(LocalDateTime.of(2022, 10, 22, 10,0, 5))
+                .build();
+        Comment comment2 = Comment.builder()
+                .id(1L)
+                .text("Test comment")
+                .created(LocalDateTime.of(2022, 10, 22, 10,0, 5))
+                .build();
+        assertTrue(comment1.equals(comment2));
     }
 
 }

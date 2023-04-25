@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.practicum.shareit.item.dto.ItemMapper.toItem;
 import static ru.practicum.shareit.item.dto.ItemMapper.toItemDto;
 
@@ -73,6 +74,26 @@ class ItemMapperTest {
         Item item = toItem(itemDto);
         assertEquals(itemDto.getName(), item.getName());
         assertEquals(itemDto.getDescription(), item.getDescription());
+    }
+
+    @Test
+    void itemEqualsTest() {
+        Item item1 = Item.builder()
+                .id(1L)
+                .name("Test item1 name")
+                .description("Test item1 description")
+                .isAvailable(true)
+                .request(ItemRequest.builder().id(1L).build())
+                .build();
+        Item item2 = Item.builder()
+                .id(1L)
+                .name("Test item1 name")
+                .description("Test item1 description")
+                .isAvailable(true)
+                .request(ItemRequest.builder().id(1L).build())
+                .build();
+        assertTrue(item1.equals(item2));
+
     }
 
 }

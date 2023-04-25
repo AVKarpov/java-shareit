@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.practicum.shareit.request.dto.ItemRequestMapper.toItemRequestResponseDto;
 
 class ItemRequestMapperTest {
@@ -55,6 +56,23 @@ class ItemRequestMapperTest {
         assertEquals(itemRequest.getDescription(), itemRequestResponseDto.get(0).getDescription());
         assertEquals(itemRequest.getCreated(), itemRequestResponseDto.get(0).getCreated());
         assertEquals(itemDto.getName(), itemRequestResponseDto.get(0).getItems().get(0).getName());
+    }
+
+    @Test
+    void itemRequestEqualsTest() {
+        ItemRequest itemRequest1 = ItemRequest.builder()
+                .id(1L)
+                .description("Test item description")
+                .requestor(User.builder().name("Test name").build())
+                .created(LocalDateTime.of(2022, 10, 22, 10,0, 5))
+                .build();
+        ItemRequest itemRequest2 = ItemRequest.builder()
+                .id(1L)
+                .description("Test item description")
+                .requestor(User.builder().name("Test name").build())
+                .created(LocalDateTime.of(2022, 10, 22, 10,0, 5))
+                .build();
+        assertTrue(itemRequest1.equals(itemRequest2));
     }
 
 }
