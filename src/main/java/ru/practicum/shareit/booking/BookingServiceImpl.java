@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -90,27 +91,30 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAllBookings(Long userId, String state) {
+    public List<BookingResponseDto> getAllBookings(Long userId, String state, int from, int size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         List<Booking> bookings;
         switch (parseStatus(state)) {
             case PAST:
                 bookings = new ArrayList<>(
-                        bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now())
+                        bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now(),
+                                PageRequest.of(from / size, size))
                 );
                 break;
 
             case FUTURE:
                 bookings = new ArrayList<>(
-                        bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now())
+                        bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now(),
+                                PageRequest.of(from / size, size))
                 );
                 break;
 
             case CURRENT:
                 bookings = new ArrayList<>(
                         bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartAsc(userId,
-                                LocalDateTime.now(), LocalDateTime.now())
+                                LocalDateTime.now(), LocalDateTime.now(),
+                                PageRequest.of(from / size, size))
                 );
                 break;
 
@@ -118,12 +122,14 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookings = new ArrayList<>(
                         bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId,
-                                BookingStatus.valueOf(state))
+                                BookingStatus.valueOf(state),
+                                PageRequest.of(from / size, size))
                 );
                 break;
 
             default: //ALL
-                bookings = new ArrayList<>(bookingRepository.findByBookerIdOrderByStartDesc(userId));
+                bookings = new ArrayList<>(bookingRepository.findByBookerIdOrderByStartDesc(userId,
+                        PageRequest.of(from / size, size)));
         }
 
         return bookings
@@ -133,31 +139,33 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAllBookingsForOwner(Long userId, String state) {
+    public List<BookingResponseDto> getAllBookingsForOwner(Long userId, String state, int from, int size) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         List<Item> items = itemRepository.findByOwnerOrderByIdAsc(user);
         List<Booking> bookings = new ArrayList<>();
         switch (parseStatus(state)) {
             case PAST:
-                    bookings.addAll(bookingRepository.findByItemInAndEndIsBeforeOrderByStartDesc(items, LocalDateTime.now()));
+                    bookings.addAll(bookingRepository.findByItemInAndEndIsBeforeOrderByStartDesc(items, LocalDateTime.now(),
+                                    PageRequest.of(from / size, size)));
                 break;
             case FUTURE:
-                    bookings.addAll(bookingRepository.findByItemInAndStartIsAfterOrderByStartDesc(items, LocalDateTime.now()));
+                    bookings.addAll(bookingRepository.findByItemInAndStartIsAfterOrderByStartDesc(items, LocalDateTime.now(),
+                            PageRequest.of(from / size, size)));
                 break;
 
             case CURRENT:
                     bookings.addAll(bookingRepository.findByItemInAndStartIsBeforeAndEndIsAfterOrderByStartDesc(items,
-                            LocalDateTime.now(), LocalDateTime.now()));
+                            LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(from / size, size)));
                 break;
 
             case WAITING:
             case REJECTED:
                     bookings.addAll(bookingRepository.findByItemInAndStatusOrderByStartDesc(items,
-                                BookingStatus.valueOf(state)));
+                                BookingStatus.valueOf(state), PageRequest.of(from / size, size)));
                 break;
             default: //ALL
-                    bookings.addAll(bookingRepository.findByItemInOrderByStartDesc(items));
+                    bookings.addAll(bookingRepository.findByItemInOrderByStartDesc(items, PageRequest.of(from / size, size)));
         }
 
         return bookings
