@@ -33,3 +33,4 @@ services:
       - POSTGRES_PASSWORD=shareit
       - POSTGRES_USER=shareit
       - POSTGRES_DB=shareit
+      - TZ=GMT
