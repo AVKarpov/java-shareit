@@ -19,8 +19,8 @@ public class ItemController {
     //GET /items?from={from}&size={size} - получение всех вещей пользователя
     @GetMapping
     public List<ItemDto> getAllItems(@RequestHeader(HEADER_USER_ID) Long userId,
-                                     @RequestParam(defaultValue = "0", required = false) int from,
-                                     @RequestParam(defaultValue = "10", required = false) int size) {
+                                     @RequestParam(defaultValue = "0") int from,
+                                     @RequestParam(defaultValue = "10") int size) {
         return itemService.getAllItems(userId, from, size);
     }
 
@@ -33,7 +33,7 @@ public class ItemController {
     //POST /items - добавление новой вещи
     @PostMapping
     public ItemDto addNewItem(@RequestHeader(HEADER_USER_ID) Long userId,
-                              @RequestBody ItemDto itemDto) { //@Validated
+                              @RequestBody ItemDto itemDto) {
         return itemService.addNewItem(userId, itemDto);
     }
 
@@ -55,8 +55,8 @@ public class ItemController {
     //GET /items/search?text={text}&from={from}&size={size}
     @GetMapping("search")
     public List<ItemDto> searchItems(@RequestParam String text,
-                                     @RequestParam(defaultValue = "0", required = false) int from, //@PositiveOrZero
-                                     @RequestParam(defaultValue = "10", required = false) int size) { //@Positive
+                                     @RequestParam(defaultValue = "0") int from,
+                                     @RequestParam(defaultValue = "10") int size) {
         return itemService.searchItems(text, from, size);
     }
 
@@ -64,7 +64,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentResponseDto addComment(@RequestHeader(HEADER_USER_ID) Long userId,
                                          @PathVariable Long itemId,
-                                         @RequestBody CommentRequestDto text) { //@Validated
+                                         @RequestBody CommentRequestDto text) {
         return itemService.addComment(userId, itemId, text);
     }
 

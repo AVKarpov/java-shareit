@@ -40,18 +40,18 @@ public class BookingController {
     //GET /bookings?state={state}&from={from}&size={size} - получение списка всех бронирований текущего пользователя
     @GetMapping
     public List<BookingResponseDto> getAllBookings(@RequestHeader(HEADER_USER_ID) Long userId,
-                                                   @RequestParam(defaultValue = "ALL", required = false) String state,
-                                                   @RequestParam(defaultValue = "0", required = false) int from,
-                                                   @RequestParam(defaultValue = "10", required = false) int size) {
+                                                   @RequestParam(defaultValue = "ALL") String state,
+                                                   @RequestParam(defaultValue = "0") int from,
+                                                   @RequestParam(defaultValue = "10") int size) {
         return bookingService.getAllBookings(userId, state, from, size);
     }
 
     //GET /bookings/owner?state={state}&from={from}&size={size} - получение списка бронирований для всех вещей текущего пользователя
     @GetMapping("/owner")
     public List<BookingResponseDto> getAllBookingsForAllItems(@RequestHeader(HEADER_USER_ID) Long userId,
-                                                              @RequestParam(defaultValue = "ALL", required = false) String state,
-                                                              @RequestParam(defaultValue = "0", required = false) int from, //@PositiveOrZero
-                                                              @RequestParam(defaultValue = "10", required = false) int size) { //@Positive
+                                                              @RequestParam(defaultValue = "ALL") String state,
+                                                              @RequestParam(defaultValue = "0") int from,
+                                                              @RequestParam(defaultValue = "10") int size) {
         return bookingService.getAllBookingsForOwner(userId, state, from, size);
     }
 }

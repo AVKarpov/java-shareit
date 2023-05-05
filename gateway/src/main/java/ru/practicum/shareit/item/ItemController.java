@@ -24,8 +24,8 @@ public class ItemController {
 
 	@GetMapping
 	public ResponseEntity<Object> getAllItems(@RequestHeader(HEADER_USER_ID) Long userId,
-									 @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
-									 @RequestParam(defaultValue = "10", required = false) @Positive int size) {
+									 @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+									 @RequestParam(defaultValue = "10") @Positive int size) {
 		log.info("Get all items userId={}, from={}, size={}", userId, from, size);
 		return itemClient.getAllItems(userId, from, size);
 	}
@@ -62,8 +62,8 @@ public class ItemController {
 	@GetMapping("search")
 	public ResponseEntity<Object> searchItems(@RequestHeader(HEADER_USER_ID) Long userId,
 											  @RequestParam String text,
-											  @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
-											  @RequestParam(defaultValue = "10", required = false) @Positive int size) {
+											  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+											  @RequestParam(defaultValue = "10") @Positive int size) {
 		log.info("Search items by text={}, userId={}, from={}, size={}", text, userId, from, size);
 		return itemClient.searchItems(userId, text, from, size);
 	}

@@ -18,7 +18,7 @@ public class ItemRequestController {
     //POST /requests - добавление нового запроса вещи
     @PostMapping
     public ItemRequestResponseDto addItemRequest(@RequestHeader(HEADER_USER_ID) Long userId,
-                                                 @RequestBody ItemRequestDto itemRequestDto) { //@Validated
+                                                 @RequestBody ItemRequestDto itemRequestDto) {
         return requestService.addItemRequest(userId, itemRequestDto);
     }
 
@@ -31,8 +31,8 @@ public class ItemRequestController {
     //GET /requests/all?from={from}&size={size} - получить список запросов, созданных другими пользователями
     @GetMapping("/all")
     public List<ItemRequestResponseDto> getAllOthersItemRequests(@RequestHeader(HEADER_USER_ID) Long userId,
-                                                  @RequestParam(defaultValue = "0") int from, //@PositiveOrZero
-                                                  @RequestParam(defaultValue = "10") int size) { //@Positive
+                                                  @RequestParam(defaultValue = "0") int from,
+                                                  @RequestParam(defaultValue = "10") int size) {
         return requestService.getAllOthersItemRequests(userId, from, size);
     }
 
